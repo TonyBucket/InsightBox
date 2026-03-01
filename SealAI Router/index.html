@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SealAI™ Router - Education OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #020617;
+            background-image: radial-gradient(at 0% 0%, rgba(8, 55, 75, 0.4) 0, transparent 50%), radial-gradient(at 100% 100%, rgba(14, 35, 65, 0.6) 0, transparent 50%);
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(10, 25, 45, 0.5) 0%, rgba(5, 15, 30, 0.7) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(34, 211, 238, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+        .glow-cyan { text-shadow: 0 0 12px rgba(34, 211, 238, 0.8); }
+    </style>
+</head>
+<body class="h-screen w-screen flex text-[13px]">
+
+    <aside class="w-64 border-r border-cyan-900/40 flex flex-col z-20 bg-[#020813]/80 backdrop-blur-xl">
+        <div class="p-6 flex items-center gap-3 border-b border-cyan-900/40">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+                <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-[17px] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200 uppercase tracking-tight">SealAI™ Router</h1>
+                <p class="text-[9px] text-cyan-400 tracking-widest font-mono uppercase font-semibold">InsightBox OS v1.0</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1.5 font-semibold text-gray-400">
+            <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-900/30 text-white border border-cyan-500/20 transition-all">
+                <i class="fa-solid fa-chart-pie w-5 text-cyan-400"></i> Tổng Quan Hệ Thống
+            </button>
+            <button onclick="switchTab('terminal')" id="nav-terminal" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 hover:text-white transition-all">
+                <i class="fa-solid fa-terminal w-5 text-green-400"></i> Server Terminal
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-cyan-900/40">
+            <div class="glass-card p-4 rounded-lg text-center bg-[#050f20]">
+                <p class="text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-wider">Edge Node (InsightBox)</p>
+                <div class="flex justify-between text-[11px] font-mono">
+                    <span class="text-gray-400">NPU/Local LLM</span>
+                    <span id="health-edge" class="text-green-400 glow-cyan font-bold">ONLINE</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header class="h-16 border-b border-cyan-900/30 flex items-center justify-between px-8 z-10 bg-[#020612]/60 backdrop-blur-md">
+            <div class="flex items-center gap-8">
+                <div class="flex flex-col">
+                    <span class="text-[9px] text-cyan-600 uppercase font-extrabold tracking-widest">Active Requests</span>
+                    <span class="font-mono text-cyan-400 text-base font-bold glow-cyan" id="top-active">0</span>
+                </div>
+            </div>
+            <div class="font-mono text-lg font-semibold text-cyan-100 glow-cyan" id="clock">00:00:00</div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 relative scroll-smooth pb-16">
+            <div id="tab-overview" class="space-y-6 block">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div class="glass-card p-6 relative overflow-hidden">
+                        <div class="absolute -right-2 -bottom-2 text-cyan-500/10 text-9xl"><i class="fa-solid fa-piggy-bank"></i></div>
+                        <h3 class="text-cyan-600 font-bold mb-1 uppercase tracking-wider text-[10px]">Tiết Kiệm OpEx (USD)</h3>
+                        <div class="text-3xl font-extrabold text-white glow-cyan font-mono mt-2">$<span id="stat-money">0.00</span></div>
+                    </div>
+                    <div class="glass-card p-6 relative overflow-hidden">
+                        <div class="absolute -right-2 -bottom-2 text-blue-500/10 text-9xl"><i class="fa-solid fa-bolt"></i></div>
+                        <h3 class="text-cyan-600 font-bold mb-1 uppercase tracking-wider text-[10px]">Tổng Lượt Truy Vấn</h3>
+                        <div class="text-3xl font-extrabold text-white font-mono mt-2" id="stat-reqs">0</div>
+                    </div>
+                    <div class="glass-card p-6 relative overflow-hidden">
+                        <div class="absolute -right-2 -bottom-2 text-indigo-500/10 text-9xl"><i class="fa-solid fa-network-wired"></i></div>
+                        <h3 class="text-cyan-600 font-bold mb-1 uppercase tracking-wider text-[10px]">Tỉ Lệ Xử Lý Cục Bộ (Edge)</h3>
+                        <div class="text-3xl font-extrabold text-white font-mono mt-2" id="stat-freeloader">0%</div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6">
+                    <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2"><i class="fa-solid fa-gauge-high text-cyan-400"></i> Radar Hiệu Năng Pipeline (RAG)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-xs text-gray-300">
+                            <thead>
+                                <tr class="border-b border-cyan-900/40 text-[10px] text-cyan-600 uppercase font-bold tracking-wider">
+                                    <th class="pb-3">Luồng Xử Lý (Models)</th><th class="pb-3">Hits</th><th class="pb-3">Tốc Độ Phản Hồi (TTFT)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="perf-table" class="divide-y divide-cyan-900/20"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-terminal" class="hidden h-[calc(100vh-10rem)]">
+                <div class="glass-card h-full flex flex-col overflow-hidden border-cyan-500/20">
+                    <div class="bg-[#020612]/80 border-b border-cyan-900/50 p-2 flex justify-between items-center px-4">
+                        <span class="font-mono text-cyan-500 font-bold text-[10px] tracking-widest">root@sealai-router:~# ./start_pipeline.sh</span>
+                        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                    </div>
+                    <div class="flex-1 p-4 font-mono text-[11px] overflow-y-auto bg-[#02040a]" id="terminal-screen">
+                        <div id="log-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            ['overview', 'terminal'].forEach(t => {
+                document.getElementById('tab-' + t).classList.add('hidden');
+                document.getElementById('nav-' + t).className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-white/5 transition-all";
+            });
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-900/30 text-white border border-cyan-500/20 transition-all";
+        }
+
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('vi-VN', { hour12: false }); }, 1000);
+
+        async function fetchOverview() {
+            try {
+                const res = await fetch('/api/analytics/overview');
+                const data = await res.json();
+                const d = data.analytics;
+
+                document.getElementById('stat-money').innerText = d.economy.shadow_billing_usd.toFixed(2);
+                document.getElementById('stat-reqs').innerText = d.traffic.successful_requests;
+                document.getElementById('stat-freeloader').innerText = d.economy.freeloader_index_pct + '%';
+                
+                let rows = '';
+                for(const [mod, s] of Object.entries(d.performance)) {
+                    rows += `<tr class="hover:bg-white/5 transition-colors"><td class="py-3 text-cyan-300 font-bold">${mod}</td><td class="py-3">${s.hits}</td><td class="py-3 text-green-400">${s.latency_ms_avg}ms</td></tr>`;
+                }
+                document.getElementById('perf-table').innerHTML = rows;
+            } catch(e) {}
+        }
+
+        const sse = new EventSource('/api/stream_logs');
+        sse.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const term = document.getElementById('terminal-screen');
+            const lc = document.getElementById('log-container');
+            let color = data.level === 'ERROR' ? 'text-red-500' : 'text-cyan-300';
+            lc.innerHTML += `<div class="mt-1 ${color}">[${data.time}] ${data.msg}</div>`;
+            term.scrollTop = term.scrollHeight;
+        };
+
+        setInterval(fetchOverview, 2000);
+        fetchOverview();
+    </script>
+</body>
+</html>
