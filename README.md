@@ -15,9 +15,12 @@ Hệ thống được thiết kế theo chuẩn Hybrid Edge-Cloud Microservices:
 
 ## 🚀 Trạng thái Phát triển (Development Status)
 Dự án hiện đang trong giai đoạn **Proof of Concept (PoC)**.
-- ✅ **SealAI Router:** ĐÃ HOÀN THIỆN PoC. Code logic phân luồng (Self-Routing) dựa trên metadata được đặt trong thư mục `/sealai-router`.
-- ⏳ **Edge Vision Pipeline:** Đang nghiên cứu tối ưu RKNN YOLOv8n trên Orange Pi.
-- ⏳ **Vector DB & RAG:** Đang trong giai đoạn thiết kế schema trên Qdrant.
+
+✔ SealAI Router – Completed
+✔ Local LLM + Qwen3 ASR – Operational
+⚙ Vector Database (Qdrant) – Integration phase
+⚙ Student App Frontend – UI/UX design phase
+⚙ Edge Hardware Node – Prototype testing
 
 ## 📂 Cấu trúc Repository
 - `/sealai-router/`: Mã nguồn lõi định tuyến AI.
