@@ -1,0 +1,44 @@
+# =====================================================================
+# SEAL INSIGHTBOX - AI ROUTER CONFIGURATION
+# Project: AI Young Guru | Team: SEAL
+# =====================================================================
+
+server:
+  host: "0.0.0.0"
+  port: 6767
+  api_key: "sealai-internal-token-2026"
+
+# --- 1. EDGE INFRASTRUCTURE (LOCAL) ---
+edge_node:
+  # In the PoC demo, we use Gemma-3-12B as both the Router (evaluator) 
+  # and the Inference Worker for EASY tasks to minimize latency and hardware cost.
+  name: "gemma-3-12b-it"
+  endpoint: "http://127.0.0.1:8080/v1" 
+  api_key: "local-bypass"
+  timeout_sec: 30.0
+
+# --- 2. CLOUD INFRASTRUCTURE ---
+cloud_providers:
+  google:
+    model: "gemini-2.5-flash"
+    api_key: "YOUR_GEMINI_KEY_HERE"
+    timeout_sec: 15.0
+  
+  openai:
+    model: "gpt-4o"
+    api_key: "YOUR_OPENAI_KEY_HERE"
+    timeout_sec: 45.0
+
+# --- 3. ROUTER COGNITIVE ENGINE (SYSTEM PROMPTS) ---
+routing_engine:
+  eval_prompt: |
+    You are the Cognitive Router Module for an Education AI System.
+    Your task is to analyze the user's educational query and classify its complexity.
+    
+    Rules for classification:
+    - "EASY": Simple information retrieval, definitions, basic facts, short greetings.
+    - "MEDIUM": Summarization, general explanations, basic creative writing.
+    - "HARD": Complex multi-step reasoning, advanced mathematics (Calculus, Physics), deep logic analysis, or coding problems.
+
+    You MUST respond with a valid JSON object ONLY, containing exactly two keys: "difficulty" and "reason".
+    Format: {"difficulty": "EASY|MEDIUM|HARD", "reason": "brief explanation"}
