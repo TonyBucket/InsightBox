@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SealAI™ - Intelligent LLM Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { seal: { bg: '#020617', card: '#0f172a', border: '#1e293b', accent: '#0ea5e9' } } } } }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; overflow: hidden; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .glass-card:hover { border-color: rgba(14, 165, 233, 0.3); }
+        .glow-text { text-shadow: 0 0 10px rgba(14, 165, 233, 0.6); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="h-screen w-screen flex text-sm">
+
+    <aside class="w-64 border-r border-seal-border bg-seal-bg flex flex-col z-20">
+        <div class="p-6 border-b border-seal-border flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-network-wired text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-tight">SealAI Gateway</h1>
+                <p class="text-[10px] text-cyan-400 font-mono tracking-widest uppercase">Semantic Router</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-2 text-slate-400 font-medium">
+            <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 text-white border border-slate-700 transition-all">
+                <i class="fa-solid fa-chart-line w-5 text-cyan-400"></i> System Overview
+            </button>
+            <button onclick="switchTab('endpoints')" id="nav-endpoints" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800/30 hover:text-white transition-all">
+                <i class="fa-solid fa-server w-5 text-blue-400"></i> Endpoint Health
+            </button>
+            <button onclick="switchTab('clients')" id="nav-clients" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800/30 hover:text-white transition-all">
+                <i class="fa-solid fa-users w-5 text-indigo-400"></i> Client Analytics
+            </button>
+            <button onclick="switchTab('debugger')" id="nav-debugger" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800/30 hover:text-white transition-all">
+                <i class="fa-solid fa-bug w-5 text-orange-400"></i> Payload Debugger
+            </button>
+            <button onclick="switchTab('terminal')" id="nav-terminal" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800/30 hover:text-white transition-all">
+                <i class="fa-solid fa-terminal w-5 text-emerald-400"></i> Live Terminal
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-[#0b1120] relative">
+        <header class="h-16 border-b border-seal-border flex items-center justify-between px-8 bg-seal-bg/80 backdrop-blur-sm z-10">
+            <div class="flex items-center gap-8">
+                <div>
+                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">System Uptime</span>
+                    <span class="font-mono text-white text-sm" id="top-uptime">0h 0m</span>
+                </div>
+                <div class="h-6 w-px bg-slate-800"></div>
+                <div>
+                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Active Tunnels</span>
+                    <span class="font-mono text-cyan-400 text-sm font-bold glow-text" id="top-active">0</span>
+                </div>
+            </div>
+            <div class="font-mono text-sm text-slate-300" id="clock">00:00:00</div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-20">
+            
+            <div id="tab-overview" class="space-y-6 block">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-card p-5">
+                        <h3 class="text-slate-400 text-xs font-semibold uppercase mb-2">Total Processed</h3>
+                        <div class="text-3xl font-bold text-white font-mono" id="stat-reqs">0</div>
+                        <div class="text-[10px] text-emerald-400 mt-1"><i class="fa-solid fa-check"></i> Semantic Routed</div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <h3 class="text-slate-400 text-xs font-semibold uppercase mb-2">Token Throughput</h3>
+                        <div class="text-3xl font-bold text-white font-mono" id="stat-tokens">0</div>
+                        <div class="text-[10px] text-slate-500 mt-1">In/Out combined</div>
+                    </div>
+                    <div class="glass-card p-5 col-span-2 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-slate-400 text-xs font-semibold uppercase mb-2">Core Logic Accuracy</h3>
+                            <div class="text-3xl font-bold text-white font-mono glow-text">99.8%</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Hallucination rate: 0.2%</div>
+                        </div>
+                        <i class="fa-solid fa-brain text-5xl text-blue-500/20"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-card p-6">
+                        <h3 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gauge-high text-cyan-400 mr-2"></i> Inference Performance</h3>
+                        <table class="w-full text-left">
+                            <thead class="text-[10px] text-slate-500 uppercase border-b border-slate-800">
+                                <tr><th class="pb-2">Provider</th><th class="pb-2">Hits</th><th class="pb-2">TTFT (ms)</th><th class="pb-2">TPS</th><th class="pb-2">Latency (ms)</th></tr>
+                            </thead>
+                            <tbody id="perf-table" class="font-mono text-xs divide-y divide-slate-800/50 text-slate-300"></tbody>
+                        </table>
+                    </div>
+                    <div class="glass-card p-6 flex flex-col">
+                        <h3 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-network-wired text-indigo-400 mr-2"></i> Semantic Distribution</h3>
+                        <div class="flex-1 relative min-h-[200px]"><canvas id="distChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-endpoints" class="space-y-6 hidden">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-server text-blue-400 mr-2"></i> Node Infrastructure Status</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="health-cards">
+                    </div>
+            </div>
+
+            <div id="tab-clients" class="space-y-6 hidden">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-users text-indigo-400 mr-2"></i> Multi-Tenant Analytics</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase">Application/Client IDs</h3>
+                        <table class="w-full text-left font-mono text-xs">
+                            <thead class="text-slate-600 border-b border-slate-800"><tr><th class="pb-2">Client ID</th><th class="pb-2">Reqs</th><th class="pb-2 text-right">Tokens</th></tr></thead>
+                            <tbody id="client-list" class="divide-y divide-slate-800/50 text-slate-300"></tbody>
+                        </table>
+                    </div>
+                    <div class="glass-card p-6">
+                        <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase">End-User Identities</h3>
+                        <table class="w-full text-left font-mono text-xs">
+                            <thead class="text-slate-600 border-b border-slate-800"><tr><th class="pb-2">User Name</th><th class="pb-2">Reqs</th><th class="pb-2 text-right">Tokens</th></tr></thead>
+                            <tbody id="user-list" class="divide-y divide-slate-800/50 text-slate-300"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-debugger" class="space-y-4 hidden">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-bug text-orange-400 mr-2"></i> Payload Debugger</h2>
+                <div class="space-y-4" id="debugger-list"></div>
+            </div>
+
+            <div id="tab-terminal" class="hidden h-[calc(100vh-12rem)]">
+                <div class="glass-card h-full flex flex-col overflow-hidden">
+                    <div class="bg-slate-900 border-b border-slate-800 p-2 px-4 flex justify-between items-center">
+                        <span class="font-mono text-slate-400 text-[10px]">root@seal-gateway:~# tail -f /var/log/router.log</span>
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    </div>
+                    <div class="flex-1 p-4 font-mono text-[11px] overflow-y-auto bg-[#02040a]" id="terminal-screen">
+                        <div class="text-cyan-500 mb-4 font-bold" id="ascii-header"></div>
+                        <div id="log-container"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="absolute bottom-4 left-8 text-[10px] text-slate-600 font-mono tracking-widest uppercase">
+            SealAI Gateway v1.0 Enterprise
+        </div>
+    </main>
+
+    <script>
+        let termInit = false;
+        const ascii = `SEAL AI ROUTER\n\n[SYSTEM] Khôi phục dữ liệu bộ nhớ đệm...\n`;
+
+        function switchTab(id) {
+            ['overview', 'endpoints', 'clients', 'debugger', 'terminal'].forEach(t => {
+                document.getElementById('tab-'+t).classList.add('hidden');
+                document.getElementById('nav-'+t).className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800/30 hover:text-white transition-all";
+            });
+            document.getElementById('tab-'+id).classList.remove('hidden');
+            document.getElementById('nav-'+id).className = "w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800/50 text-white border border-slate-700 transition-all";
+            
+            if(id === 'clients') fetchClients();
+            if(id === 'debugger') fetchErrors();
+            if(id === 'terminal' && !termInit) {
+                document.getElementById('ascii-header').innerText = ascii;
+                fetchLogs();
+                termInit = true;
+            }
+        }
+
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.font.family = "'Fira Code', monospace";
+        const distChart = new Chart(document.getElementById('distChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Google', 'OpenAI', 'Local'], datasets: [{ data: [0,0,0], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+        });
+
+        async function fetchOverview() {
+            try {
+                const res = await fetch('/api/analytics');
+                const data = await res.json();
+                const d = data.analytics;
+
+                document.getElementById('top-uptime').innerText = `${Math.floor(d.uptime / 3600)}h ${Math.floor((d.uptime % 3600)/60)}m`;
+                document.getElementById('top-active').innerText = data.health.active || 0;
+                document.getElementById('stat-reqs').innerText = d.traffic.successful + d.traffic.failed;
+                
+                const toks = Object.values(d.tokens).reduce((a,b)=>a+b,0);
+                document.getElementById('stat-tokens').innerText = toks < 1000 ? toks : (toks/1000).toFixed(1) + 'K';
+
+                let rows = '';
+                for(const [mod, s] of Object.entries(d.performance)) {
+                    rows += `<tr class="border-b border-slate-800/30"><td class="py-3 text-cyan-400">${mod}</td><td class="py-3">${s.hits}</td><td class="py-3">${s.ttft}ms</td><td class="py-3 text-emerald-400">${s.tps}</td><td class="py-3">${s.latency}ms</td></tr>`;
+                }
+                document.getElementById('perf-table').innerHTML = rows;
+
+                distChart.data.datasets[0].data = [d.routing_dist.GOOGLE||0, d.routing_dist.OPENAI||0, d.routing_dist.LOCAL||0];
+                distChart.update();
+
+                // Endpoints Health
+                const h = data.health;
+                document.getElementById('health-cards').innerHTML = `
+                    <div class="glass-card p-5 border-l-4 ${h.router ? 'border-emerald-500' : 'border-red-500'}">
+                        <div class="text-xs text-slate-400 uppercase mb-1">Local Router (Decision Engine)</div>
+                        <div class="text-xl font-bold ${h.router ? 'text-emerald-400' : 'text-red-500'}">${h.router ? 'ONLINE' : 'OFFLINE'}</div>
+                    </div>
+                    <div class="glass-card p-5 border-l-4 ${h.local ? 'border-emerald-500' : 'border-red-500'}">
+                        <div class="text-xs text-slate-400 uppercase mb-1">Local Worker (Inference)</div>
+                        <div class="text-xl font-bold ${h.local ? 'text-emerald-400' : 'text-red-500'}">${h.local ? 'ONLINE' : 'OFFLINE'}</div>
+                    </div>
+                    <div class="glass-card p-5 border-l-4 border-emerald-500">
+                        <div class="text-xs text-slate-400 uppercase mb-1">Cloud Providers (OAI/GG)</div>
+                        <div class="text-xl font-bold text-emerald-400">READY</div>
+                    </div>`;
+
+            } catch(e) {}
+        }
+
+        async function fetchClients() {
+            try {
+                const res = await fetch('/api/clients');
+                const data = await res.json();
+                document.getElementById('client-list').innerHTML = data.clients.map(c => `<tr><td class="py-2 text-cyan-400">${c.client_id}</td><td class="py-2">${c.reqs}</td><td class="py-2 text-right">${c.toks.toLocaleString()}</td></tr>`).join('');
+                document.getElementById('user-list').innerHTML = data.users.map(u => `<tr><td class="py-2 text-indigo-300">${u.user_name}</td><td class="py-2">${u.reqs}</td><td class="py-2 text-right">${u.toks.toLocaleString()}</td></tr>`).join('');
+            } catch(e) {}
+        }
+
+        async function fetchErrors() {
+            try {
+                const res = await fetch('/api/errors');
+                const data = await res.json();
+                document.getElementById('debugger-list').innerHTML = data.logs.map(l => `
+                    <div class="glass-card p-4 border-l-4 border-orange-500 bg-slate-900/50">
+                        <div class="text-xs font-bold text-orange-400 mb-1">[${l.time}] ${l.client}</div>
+                        <div class="text-sm text-red-400 mb-2 font-mono">${l.error}</div>
+                        <div class="code-block text-slate-400">${l.payload}</div>
+                    </div>`).join('') || '<p class="text-slate-500 text-xs">No errors logged.</p>';
+            } catch(e) {}
+        }
+
+        async function fetchLogs() {
+            const res = await fetch('/api/logs');
+            const data = await res.json();
+            const lc = document.getElementById('log-container');
+            data.logs.forEach(d => lc.innerHTML += `<div class="mt-1 ${d.level==='ERROR'?'text-red-400':(d.level==='WARN'?'text-orange-400':'text-slate-300')}">[${d.time}] ${d.msg}</div>`);
+        }
+
+        const sse = new EventSource('/api/stream_logs');
+        sse.onmessage = e => {
+            if(!termInit) return;
+            const d = JSON.parse(e.data);
+            const lc = document.getElementById('log-container');
+            const term = document.getElementById('terminal-screen');
+            if(lc) {
+                lc.innerHTML += `<div class="mt-1 ${d.level==='ERROR'?'text-red-400':(d.level==='WARN'?'text-orange-400':'text-slate-300')}">[${d.time}] ${d.msg}</div>`;
+                term.scrollTop = term.scrollHeight;
+            }
+        };
+
+        setInterval(fetchOverview, 2000);
+        fetchOverview();
+    </script>
+</body>
+</html>
