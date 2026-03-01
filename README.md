@@ -1,52 +1,91 @@
-# 🦭 SEAL InsightBox™ - Edge-Cloud Hybrid AI Infrastructure
+<div align="center">
 
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/framework-FastAPI-009688)](https://fastapi.tiangolo.com/)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+🦭 SEAL InsightBox™
 
-**InsightBox** là hệ thống hạ tầng trí tuệ nhân tạo chuyên biệt nhằm giải quyết bài toán "đứt gãy tri thức" trong môi trường giáo dục. Dự án tích hợp các công nghệ tối tân về Edge Computing, Multimodal RAG và Self-Routing LLM để số hóa toàn bộ ngữ cảnh lớp học vật lý (physical classroom).
+Hệ thống chống đứt gãy tri thức & Trợ lý học tập Đa luồng (Hybrid Edge-Cloud AI)
 
----
+</div>
 
-## 🚀 Tính Năng Cốt Lõi (Key Features)
+🚦 Tình trạng Dự án (Project Status)
 
-### 🧠 1. SealAI™ Smart Routing
-Hệ thống sử dụng một mô hình ngôn ngữ lớn (ở demo ) đóng vai trò làm "Trạm điều phối". Router sẽ phân tích độ phức tạp của câu hỏi (Cognitive Load) để định tuyến dữ liệu:
-- **EASY:** Xử lý tại chỗ (Local Edge) bằng Gemma 3 để bảo mật dữ liệu và tiết kiệm 100% chi phí API.
-- **MEDIUM:** Định tuyến tới Gemini 2.5 Flash để tối ưu tốc độ.
-- **HARD:** Kích hoạt OpenAI GPT-5 với tham số `reasoning_effort="high"` cho các bài toán chuyên sâu.
+Dự án đang trong giai đoạn phát triển tích cực (Active Development). Dưới đây là tiến độ các module:
 
-### 📶 2. Smart Edge Capture Node (IoT)
-Thiết bị phần cứng tại lớp học tích hợp NPU (0.8 TOPS) chạy thuật toán **YOLOv8n** để:
-- Tự động nhận diện bảng giảng.
-- Chỉ chụp hình (Keyframe) khi giáo viên không che bảng và có nét phấn mới (thuật toán SSIM).
-- Hoạt động **Offline-First** với Local Cache trên thẻ MicroSD.
+[x] SealAI™ Router Core: Đã hoàn thiện. Xử lý định tuyến thông minh, Fallback Protocol và phân tải Edge-Cloud.
 
-### ⏱️ 3. Time-Sync Slider (UX/UI)
-Giao diện người dùng cho phép học sinh "quay ngược thời gian" để xem chính xác nét phấn và lời giảng của thầy cô tại thời điểm kiến thức được hình thành.
+[x] Web Dashboard (Router UI): Đã hoàn thiện. Monitor realtime log, TTFT, và TPS.
 
----
+[ ] Smart Edge Capture Node (Hardware): Đang phát triển (Tích hợp NPU, Camera, Mic Array trên board Orange Pi).
 
-## 🏗️ Kiến Trúc Hệ Thống (System Architecture)
+[ ] Frontend Student App: Đang phát triển (Tính năng Time-Sync Slider, hiển thị UI đa luồng).
+
+[ ] Dual-Embedding & Vector DB: Đang tích hợp (Qdrant & BGE-M3).
+
+🚀 Tính Năng Cốt Lõi (Key Features)
+
+🧠 1. SealAI™ Smart Routing (LLM-based Router)
+
+Hệ thống sử dụng Gemma 3 đóng vai trò làm "Trạm điều phối tư duy". Router sẽ phân tích độ phức tạp của câu hỏi (Cognitive Load) từ học sinh để định tuyến:
+
+EASY (Truy xuất cơ bản): Xử lý tại chỗ (Local Edge Node) để bảo mật dữ liệu và tiết kiệm 100% chi phí API (Zero-cost).
+
+MEDIUM (Tóm tắt, giải thích): Định tuyến tới Cloud (Gemini 2.5 Flash / Haiku).
+
+HARD (Toán học, suy luận sâu): Kích hoạt OpenAI GPT-4o/GPT-5 với tham số reasoning_effort="high".
+
+📶 2. Nút Biên Thông Minh (Smart Edge Node) - In Dev
+
+Thiết bị phần cứng tại lớp học (InsightBox) tối ưu cực hạn băng thông:
+
+Zero-Stream Vision: NPU chạy mô hình YOLOv8n quét Bounding Box giáo viên. Chỉ chụp hình (Keyframe) khi có nét phấn mới (SSIM) và giáo viên không che bảng.
+
+Offline-First & UPS Mode: Lưu cache vào thẻ MicroSD khi rớt mạng; tích hợp mạch Buck + Pin Lithium kháng lỗi cúp cầu dao.
+
+⏱️ 3. Time-Sync Slider (UX/UI) - In Dev
+
+Trải nghiệm học tập đậm chất điện ảnh: Kết nối trực tiếp "Snapshot nét phấn trên bảng" với "Audio lời giảng". Học sinh có thể kéo thanh trượt thời gian để tái hiện chính xác ngữ cảnh của tiết học.
+
+🛠️ Cài đặt & Chạy Module Router (Quick Start)
+
+Hiện tại, bạn có thể chạy thử nghiệm module SealAI™ Router cục bộ.
+
+1. Yêu cầu hệ thống
+
+Python 3.10 trở lên
+
+Môi trường hỗ trợ chạy FastAPI
+
+2. Cài đặt môi trường
+
+Clone repository và cài đặt các thư viện cần thiết:
+
+git clone [https://github.com/TonyBucket/InsightBox.git](https://github.com/TonyBucket/InsightBox.git)
+cd InsightBox/"SealAI Router"
+pip install -r requirements.txt
 
 
+3. Cấu hình (Configuration)
 
-Hệ thống vận hành dựa trên đường ống dữ liệu (Data Pipeline) 4 bước:
-1. **Capture:** Thu thập đa luồng (Audio/Visual) tại Edge.
-2. **Digest:** Bóc băng (Qwen3-ASR) và Chuẩn hóa Toán học (Gemma 3) tại Local Server.
-3. **Embed:** Nhúng Vector vào Qdrant DB.
-4. **Route:** Điều phối truy vấn thông minh qua SealAI™ Router.
+Lần đầu tiên chạy, hệ thống sẽ tự động sinh ra file config.yaml. Bạn có thể chỉnh sửa file này để điền API Keys cho Google (Gemini) và OpenAI, hoặc thiết lập endpoint cho Local LLM của bạn.
 
----
+4. Khởi động Router
 
-## 💻 Cài Đặt (Installation)
+python router.py
 
-### Yêu cầu hệ thống:
-- Python 3.10+
-- Local LLM Server (llama.cpp hoặc Ollama)
 
-### Các bước thực hiện:
-1. **Clone repository:**
-   ```bash
-   git clone [https://github.com/TonyBucket/InsightBox.git](https://github.com/TonyBucket/InsightBox.git)
-   cd InsightBox/SealAI-Router
+API Endpoint: http://localhost:6767/v1/chat/completions
+
+Live Dashboard (Enterprise UI): Truy cập trực tiếp http://localhost:6767 trên trình duyệt để theo dõi luồng định tuyến và metric hệ thống theo thời gian thực.
+
+👨‍💻 Đội ngũ phát triển (Team SEAL)
+
+Dự án được xây dựng và phát triển cho cuộc thi AI Young Guru 2026.
+
+Đào Huỳnh Chí Thăng (Tony) - AI & Systems Engineer & Hardware & IoT Specialist (Founder)
+
+Trần Đông Kha - AI & Systems Engineer
+
+Nguyễn Ngọc Tuyền - Research & Data Ops & Designer
+
+📜 Giấy phép (License)
+
+Dự án này được phân phối dưới giấy phép MIT License. Xem chi tiết tại file LICENSE.
