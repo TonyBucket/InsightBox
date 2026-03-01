@@ -1,0 +1,34 @@
+server:
+  api_key: sealai-admin
+  port: 6767
+router_node:
+  endpoint: http://127.0.0.1:11434/v1
+  model: gemma-3-12b
+providers:
+  google:
+    api_key: YOUR_GOOGLE_KEY
+    model: gemini-2.5-flash
+  openai:
+    api_key: YOUR_OPENAI_KEY
+    model: gpt-5.2
+  local_worker:
+    endpoint: http://127.0.0.1:11435/v1
+    model: gemma-3-12b
+router_prompt: 'You are the Semantic Router for an Enterprise AI Gateway.
+
+  Analyze the user''s message and select the most appropriate AI model.
+
+  Options:
+
+  1. "OPENAI" - For complex math, logic, or advanced reasoning.
+
+  2. "GOOGLE" - For general knowledge, creative writing, or fast responses.
+
+  3. "LOCAL" - For simple chitchat, privacy-sensitive data, or offline query.
+
+
+  User Message: "{user_message}"
+
+
+  Respond strictly in valid JSON format: {"target": "MODEL_NAME", "reason": "brief
+  explanation"}'
