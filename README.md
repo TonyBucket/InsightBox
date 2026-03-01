@@ -14,7 +14,7 @@
 Hệ thống sử dụng một mô hình ngôn ngữ lớn (ở demo ) đóng vai trò làm "Trạm điều phối". Router sẽ phân tích độ phức tạp của câu hỏi (Cognitive Load) để định tuyến dữ liệu:
 - **EASY:** Xử lý tại chỗ (Local Edge) bằng Gemma 3 để bảo mật dữ liệu và tiết kiệm 100% chi phí API.
 - **MEDIUM:** Định tuyến tới Gemini 2.5 Flash để tối ưu tốc độ.
-- **HARD:** Kích hoạt OpenAI GPT-4o với tham số `reasoning_effort="high"` cho các bài toán chuyên sâu.
+- **HARD:** Kích hoạt OpenAI GPT-5 với tham số `reasoning_effort="high"` cho các bài toán chuyên sâu.
 
 ### 📶 2. Smart Edge Capture Node (IoT)
 Thiết bị phần cứng tại lớp học tích hợp NPU (0.8 TOPS) chạy thuật toán **YOLOv8n** để:
